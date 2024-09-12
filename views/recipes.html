@@ -1,0 +1,11 @@
+{{define "content"}}
+<h1>Recipes</h1>
+<ul>
+  {{range .}}
+  <li>
+    <a href="/recipes//{{.ID}}">{{.Name}}</a>
+  </li>
+  {{end}}
+</ul>
+<a href="/recipes/new">Add New Recipe</a>
+{{end}}

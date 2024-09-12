@@ -1,0 +1,58 @@
+{{define "content"}}
+<h1>{{.Title}}</h1>
+<form class="recipe-form" hx-post="{{.Action}}">
+  <label for="name">Recipe Name</label>
+  <input
+    type="text"
+    name="name"
+    placeholder="Recipe Name"
+    value="{{.Recipe.Name}}"
+    required
+  />
+  <label for="description">Recipe Description</label>
+  <input
+    type="text"
+    name="description"
+    placeholder="Recipe Description"
+    value="{{.Recipe.Description}}"
+    required
+  />
+  <section class="ingredients-container">
+    <label for="ingredients">Ingredients</label>
+    <button
+      type="button"
+      _="on click put #ingredient-template.content.cloneNode(true) at the end of #ingredients-list"
+    >
+      + Ingredient
+    </button>
+    <div id="ingredients-list">
+      {{ range .Recipe.Ingredients }}
+      <div class="ingredient">
+        <input
+          type="text"
+          name="ingredients"
+          placeholder="Ingredient Name"
+          value="{{.Name}}"
+        />
+        <input
+          type="text"
+          name="quantities"
+          placeholder="Quantity"
+          value="{{.Quantity}}"
+        />
+        <button type="button" _="on click remove closest .ingredient">-</button>
+      </div>
+      {{ end }}
+    </div>
+  </section>
+  <button type="submit">Submit</button>
+</form>
+
+<template id="ingredient-template">
+  <div class="ingredient">
+    <input type="text" name="ingredients" placeholder="Ingredient Name" />
+    <input type="text" name="quantities" placeholder="Quantity" />
+    <button type="button" _="on click remove closest .ingredient">-</button>
+  </div>
+</template>
+{{end}}
