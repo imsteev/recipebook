@@ -45,6 +45,12 @@
       {{ end }}
     </div>
   </section>
+  <section class="instructions-container">
+    <label for="instructions">Instructions</label>
+    <textarea name="instructions" placeholder="Instructions" required>
+{{.Recipe.Instructions}}</textarea
+    >
+  </section>
   <button type="submit">Submit</button>
 </form>
 
@@ -55,4 +61,5 @@
     <button type="button" _="on click remove closest .ingredient">-</button>
   </div>
 </template>
+
 {{end}}
