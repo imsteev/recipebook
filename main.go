@@ -56,14 +56,13 @@ func main() {
 }
 
 func setupRoutes(router *mux.Router) {
-
-	engine := views.NewEngine("base.html")
-
-	recipeController := controllers.RecipeController{DB: db, Engine: engine, Store: store}
-	authController := controllers.AuthController{DB: db, Engine: engine, Store: store}
-
+	// Static files
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
+	// Controllers
+	engine := views.NewEngine("base.html")
+	recipeController := controllers.RecipeController{DB: db, Engine: engine, Store: store}
+	authController := controllers.AuthController{DB: db, Engine: engine, Store: store}
 	router.HandleFunc("/", authController.LandingPage).Methods("GET")
 	router.HandleFunc("/login", authController.LoginPage).Methods("GET")
 	router.HandleFunc("/login", authController.Login).Methods("POST")
