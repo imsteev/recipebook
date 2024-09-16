@@ -1,13 +1,19 @@
 {{define "content"}}
 <h1>{{.Name}}</h1>
 <p>{{.Description}}</p>
-<h2>Ingredients</h2>
-<ul>
-  {{range .Ingredients}}
-  <li>{{.Name}} [{{.Quantity}}]</li>
-  {{end}}
-</ul>
-<h2>Instructions</h2>
-<pre>{{.Instructions}}</pre>
-<a href="/recipes/{{.ID}}/edit">Edit Recipe</a>
+<div class="flex flex-col gap-2 mt-8">
+  <h2>Ingredients</h2>
+  <ul>
+    {{range .Ingredients}}
+    <li>{{.Name}} [{{.Quantity}}]</li>
+    {{end}}
+  </ul>
+</div>
+<div class="flex flex-col gap-2 mt-8">
+  <h2>Instructions</h2>
+  <pre>{{.Instructions}}</pre>
+</div>
+
+<a class="link" href="/recipes/{{.ID}}/edit">Edit Recipe</a>
+
 {{end}}
