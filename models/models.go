@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Recipe struct {
 	gorm.Model
+	UserID       uint         `json:"user_id"`
 	Name         string       `json:"name"`
 	Ingredients  []Ingredient `json:"ingredients" gorm:"many2many:recipe_ingredients;"`
 	Description  string       `json:"description"`

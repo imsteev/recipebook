@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/imsteev/recipebook/controllers"
+	"github.com/imsteev/recipebook/middleware"
 	"github.com/imsteev/recipebook/models"
 	"github.com/imsteev/recipebook/views"
 	"gorm.io/driver/postgres"
@@ -61,20 +62,22 @@ func setupRoutes(router *mux.Router) {
 
 	// Controllers
 	engine := views.NewEngine("base.html")
-	recipeController := controllers.RecipeController{DB: db, Engine: engine, Store: store}
 	authController := controllers.AuthController{DB: db, Engine: engine, Store: store}
+	recipeController := controllers.RecipeController{DB: db, Engine: engine, Store: store}
+
+	recipeRouter := router.NewRoute().Subrouter()
+	recipeRouter.Use(middleware.NoCache)
+
 	router.HandleFunc("/", authController.LandingPage).Methods("GET")
 	router.HandleFunc("/login", authController.LoginPage).Methods("GET")
 	router.HandleFunc("/login", authController.Login).Methods("POST")
 	router.HandleFunc("/logout", authController.Logout).Methods("GET")
 	router.HandleFunc("/signup", authController.SignupPage).Methods("GET")
 	router.HandleFunc("/signup", authController.Signup).Methods("POST")
-	router.HandleFunc("/recipes", recipeController.ListRecipes).Methods("GET")
-	router.HandleFunc("/recipes", recipeController.CreateRecipe).Methods("POST")
-	router.HandleFunc("/recipes/new", recipeController.NewRecipe).Methods("GET")
-	router.HandleFunc("/recipes/{id}", recipeController.GetRecipe).Methods("GET")
-	router.HandleFunc("/recipes/{id}/edit", recipeController.EditRecipe).Methods("GET")
-	router.HandleFunc("/recipes/{id}/edit", recipeController.UpdateRecipe).Methods("POST")
-	router.HandleFunc("/recipes/{id}/ingredients", recipeController.AddIngredientToRecipe).Methods("POST")
-	router.HandleFunc("/recipes/{id}/ingredients/{ingredientId}", recipeController.RemoveIngredientFromRecipe).Methods("DELETE")
+	recipeRouter.HandleFunc("/recipes", recipeController.ListRecipes).Methods("GET")
+	recipeRouter.HandleFunc("/recipes", recipeController.CreateRecipe).Methods("POST")
+	recipeRouter.HandleFunc("/recipes/new", recipeController.NewRecipe).Methods("GET")
+	recipeRouter.HandleFunc("/recipes/{id}", recipeController.GetRecipe).Methods("GET")
+	recipeRouter.HandleFunc("/recipes/{id}/edit", recipeController.EditRecipe).Methods("GET")
+	recipeRouter.HandleFunc("/recipes/{id}/edit", recipeController.UpdateRecipe).Methods("POST")
 }

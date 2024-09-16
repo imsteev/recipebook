@@ -1,5 +1,12 @@
 {{define "content"}}
-<h1>Recipes</h1>
+<header class="flex justify-between items-center">
+  <h1>Recipes</h1>
+  <nav>
+    <a class="link" href="/recipes">Recipes</a>
+    <a class="link" href="/recipes/new">New Recipe</a>
+    <a class="link" href="/logout">Log Out</a>
+  </nav>
+</header>
 <ul>
   {{range .}}
   <li>
@@ -7,5 +14,4 @@
   </li>
   {{end}}
 </ul>
-<a class="link" href="/recipes/new">Add New Recipe</a>
 {{end}}

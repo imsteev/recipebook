@@ -2,5 +2,8 @@
   "dependencies": {},
   "devDependencies": {
     "tailwindcss": "^3.4.11"
+  },
+  "scripts": {
+    "watch": "bunx tailwindcss -i ./static/basetailwind.css -o ./static/main.css --watch"
   }
 }

@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -21,9 +19,10 @@ type RecipeController struct {
 }
 
 func (c *RecipeController) NewRecipe(w http.ResponseWriter, r *http.Request) {
-	err := c.Engine.ExecuteContent(w, "recipe-form.html", map[string]string{
+	err := c.Engine.ExecuteContent(w, "recipe-form.html", map[string]any{
 		"Title":  "New Recipe",
 		"Action": "/recipes",
+		"Recipe": models.Recipe{},
 	})
 
 	if err != nil {
@@ -43,13 +42,32 @@ func (c *RecipeController) CreateRecipe(w http.ResponseWriter, r *http.Request) 
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	recipe := models.Recipe{
-		Name:        r.FormValue("name"),
-		Description: r.FormValue("description"),
-	}
-	if recipe.Name == "" || recipe.Description == "" {
-		http.Error(w, "Name and description are required", http.StatusBadRequest)
+
+	err = r.ParseForm()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	var (
+		name         = r.PostFormValue("name")
+		description  = r.PostFormValue("description")
+		instructions = r.PostFormValue("instructions")
+	)
+
+	if name == "" {
+		http.Error(w, "Name is required", http.StatusBadRequest)
+		return
+	}
+
+	ingredients := c.ParseIngredients(r.PostForm["ingredients"], r.PostForm["quantities"])
+
+	recipe := models.Recipe{
+		Name:         name,
+		Description:  description,
+		Ingredients:  ingredients,
+		Instructions: instructions,
+		UserID:       uint(sesh.Values["loggedInUserID"].(uint)),
 	}
 
 	if err := c.DB.Create(&recipe).Error; err != nil {
@@ -57,7 +75,7 @@ func (c *RecipeController) CreateRecipe(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	http.Redirect(w, r, "/recipes", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/recipes/%d", recipe.ID), http.StatusSeeOther)
 }
 
 func (c *RecipeController) ListRecipes(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +91,7 @@ func (c *RecipeController) ListRecipes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var recipes []models.Recipe
-	c.DB.Find(&recipes)
+	c.DB.Find(&recipes).Order("updated_at DESC")
 
 	err = c.Engine.ExecuteContent(w, "recipes.html", recipes)
 	if err != nil {
@@ -224,50 +242,4 @@ func (c *RecipeController) ParseIngredients(strIngredients []string, strQuantiti
 	}
 
 	return ingredientList
-}
-
-func (c *RecipeController) AddIngredientToRecipe(w http.ResponseWriter, r *http.Request) {
-	sesh, err := c.Store.Get(r, "sesh")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if sesh.Values["loggedInUserID"] == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-	params := mux.Vars(r)
-	recipeID, _ := strconv.ParseUint(params["id"], 10, 32)
-
-	var recipeIngredient models.RecipeIngredient
-	if err := json.NewDecoder(r.Body).Decode(&recipeIngredient); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	recipeIngredient.RecipeID = uint(recipeID)
-	if err := c.DB.Create(&recipeIngredient).Error; err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	var ingredient models.Ingredient
-	c.DB.First(&ingredient, recipeIngredient.IngredientID)
-
-	ingredientHTML := fmt.Sprintf(`<input type="text" name="ingredients" placeholder="Ingredients" value="%s" />`, ingredient.Name)
-	w.Write([]byte(ingredientHTML))
-}
-
-func (c *RecipeController) RemoveIngredientFromRecipe(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	recipeID := params["id"]
-	ingredientID := params["ingredientId"]
-
-	if err := c.DB.Where("recipe_id = ? AND ingredient_id = ?", recipeID, ingredientID).Delete(&models.RecipeIngredient{}).Error; err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
 }

@@ -1,5 +1,12 @@
 {{define "content"}}
-<h1>{{.Name}}</h1>
+<header class="flex justify-between items-center">
+  <h1>{{.Name}}</h1>
+  <nav>
+    <a class="link" href="/recipes">Recipes</a>
+    <a class="link" href="/recipes/new">New Recipe</a>
+    <a class="link" href="/signout">Log Out</a>
+  </nav>
+</header>
 <p>{{.Description}}</p>
 <div class="flex flex-col gap-2 mt-8">
   <h2>Ingredients</h2>

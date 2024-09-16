@@ -77,7 +77,7 @@ func (c *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 	sesh.Values["loggedInUserID"] = user.ID
 	sesh.Save(r, w)
 
-	http.Redirect(w, r, "/recipes", http.StatusSeeOther)
+	w.Header().Add("HX-Redirect", "/recipes")
 }
 
 func (c *AuthController) Logout(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +91,7 @@ func (c *AuthController) Logout(w http.ResponseWriter, r *http.Request) {
 	sesh.Options.MaxAge = -1
 	sesh.Save(r, w)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	w.Header().Add("HX-Redirect", "/login")
 }
 
 func (c *AuthController) SignupPage(w http.ResponseWriter, r *http.Request) {

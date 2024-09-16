@@ -1,24 +1,30 @@
 {{define "content"}}
-<h1>{{.Title}}</h1>
-<form class="recipe-form mt-8" hx-post="{{.Action}}">
-  <label for="name">Recipe Name</label>
-  <input
-    type="text"
-    name="name"
-    placeholder="Recipe Name"
-    value="{{.Recipe.Name}}"
-    required
-  />
-  <label for="description">Recipe Description</label>
+<header class="flex justify-between items-center">
+  <h1>
+    <input
+      placeholder="Recipe name"
+      required
+      type="text"
+      name="name"
+      value="{{.Recipe.Name}}"
+    />
+  </h1>
+  <nav>
+    <a class="link" href="/recipes">Recipes</a>
+    <a class="link" href="/recipes/new">New Recipe</a>
+    <a class="link" href="/logout">Log Out</a>
+  </nav>
+</header>
+<form class="recipe-form mt-8" hx-post="{{.Action}}" hx-target="body">
+  <h2>Description</h2>
   <input
     type="text"
     name="description"
     placeholder="Recipe Description"
     value="{{.Recipe.Description}}"
-    required
   />
   <section class="ingredients-container mt-8">
-    <header class="flex flex-start items-center gap-4">
+    <hgroup class="flex flex-start items-center gap-4">
       <h2>Ingredients</h2>
       <button
         type="button"
@@ -27,7 +33,7 @@
       >
         + Ingredient
       </button>
-    </header>
+    </hgroup>
 
     <div id="ingredients-list" class="flex flex-col gap-2 mt-4">
       {{ range .Recipe.Ingredients }}
@@ -65,12 +71,7 @@
   </section>
   <section class="instructions-container mt-8">
     <h2>Instructions</h2>
-    <textarea
-      class="w-1/2 h-48"
-      name="instructions"
-      placeholder="Instructions"
-      required
-    >
+    <textarea class="w-1/2 h-48" name="instructions" placeholder="Instructions">
 {{.Recipe.Instructions}}</textarea
     >
   </section>
@@ -78,7 +79,7 @@
     class="bg-blue-500 text-white rounded-sm p-2 hover:bg-blue-600"
     type="submit"
   >
-    Submit
+    Save
   </button>
 </form>
 
