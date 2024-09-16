@@ -9,18 +9,18 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/imsteev/recipebook-htmx/lib"
 	"github.com/imsteev/recipebook-htmx/models"
+	"github.com/imsteev/recipebook-htmx/views"
 	"gorm.io/gorm"
 )
 
-type Controller struct {
+type RecipeController struct {
 	DB     *gorm.DB
-	Engine *lib.Engine
+	Engine *views.Engine
 	Store  *sessions.CookieStore
 }
 
-func (c *Controller) NewRecipe(w http.ResponseWriter, r *http.Request) {
+func (c *RecipeController) NewRecipe(w http.ResponseWriter, r *http.Request) {
 	err := c.Engine.ExecuteContent(w, "recipe-form.html", map[string]string{
 		"Title":  "New Recipe",
 		"Action": "/recipes",
@@ -32,7 +32,7 @@ func (c *Controller) NewRecipe(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (c *Controller) CreateRecipe(w http.ResponseWriter, r *http.Request) {
+func (c *RecipeController) CreateRecipe(w http.ResponseWriter, r *http.Request) {
 	sesh, err := c.Store.Get(r, "sesh")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -60,7 +60,7 @@ func (c *Controller) CreateRecipe(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/recipes", http.StatusSeeOther)
 }
 
-func (c *Controller) ListRecipes(w http.ResponseWriter, r *http.Request) {
+func (c *RecipeController) ListRecipes(w http.ResponseWriter, r *http.Request) {
 	sesh, err := c.Store.Get(r, "sesh")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -82,7 +82,7 @@ func (c *Controller) ListRecipes(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (c *Controller) GetRecipe(w http.ResponseWriter, r *http.Request) {
+func (c *RecipeController) GetRecipe(w http.ResponseWriter, r *http.Request) {
 	sesh, err := c.Store.Get(r, "sesh")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -112,7 +112,7 @@ func (c *Controller) GetRecipe(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (c *Controller) EditRecipe(w http.ResponseWriter, r *http.Request) {
+func (c *RecipeController) EditRecipe(w http.ResponseWriter, r *http.Request) {
 	sesh, err := c.Store.Get(r, "sesh")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -127,7 +127,9 @@ func (c *Controller) EditRecipe(w http.ResponseWriter, r *http.Request) {
 	recipeID := params["id"]
 
 	var recipe models.Recipe
-	if err := c.DB.Preload("Ingredients").First(&recipe, recipeID).Error; err != nil {
+	if err := c.DB.Preload("Ingredients", func(db *gorm.DB) *gorm.DB {
+		return db.Order("ingredients.name ASC")
+	}).First(&recipe, recipeID).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
@@ -143,7 +145,7 @@ func (c *Controller) EditRecipe(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (c *Controller) UpdateRecipe(w http.ResponseWriter, r *http.Request) {
+func (c *RecipeController) UpdateRecipe(w http.ResponseWriter, r *http.Request) {
 	sesh, err := c.Store.Get(r, "sesh")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -186,10 +188,6 @@ func (c *Controller) UpdateRecipe(w http.ResponseWriter, r *http.Request) {
 		instructions = r.PostFormValue("instructions")
 	)
 
-	fmt.Println(name)
-	fmt.Println(r.PostForm["ingredients"])
-	fmt.Println(r.PostForm["quantities"])
-
 	ingredients := c.ParseIngredients(r.PostForm["ingredients"], r.PostForm["quantities"])
 
 	if name == "" {
@@ -210,7 +208,7 @@ func (c *Controller) UpdateRecipe(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("HX-Redirect", fmt.Sprintf("/recipes/%s", recipeID))
 }
 
-func (c *Controller) ParseIngredients(strIngredients []string, strQuantities []string) []models.Ingredient {
+func (c *RecipeController) ParseIngredients(strIngredients []string, strQuantities []string) []models.Ingredient {
 	var ingredientList []models.Ingredient
 
 	for i := 0; i < len(strIngredients); i++ {
@@ -228,7 +226,7 @@ func (c *Controller) ParseIngredients(strIngredients []string, strQuantities []s
 	return ingredientList
 }
 
-func (c *Controller) AddIngredientToRecipe(w http.ResponseWriter, r *http.Request) {
+func (c *RecipeController) AddIngredientToRecipe(w http.ResponseWriter, r *http.Request) {
 	sesh, err := c.Store.Get(r, "sesh")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -261,7 +259,7 @@ func (c *Controller) AddIngredientToRecipe(w http.ResponseWriter, r *http.Reques
 	w.Write([]byte(ingredientHTML))
 }
 
-func (c *Controller) RemoveIngredientFromRecipe(w http.ResponseWriter, r *http.Request) {
+func (c *RecipeController) RemoveIngredientFromRecipe(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	recipeID := params["id"]
 	ingredientID := params["ingredientId"]
