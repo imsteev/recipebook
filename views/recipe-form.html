@@ -1,22 +1,22 @@
 {{define "content"}}
-<header class="flex justify-between items-center">
-  <h1>
-    <input
-      placeholder="Recipe name"
-      required
-      type="text"
-      name="name"
-      value="{{.Recipe.Name}}"
-    />
-  </h1>
-  <nav>
-    <a class="link" href="/recipes">Recipes</a>
-    <a class="link" href="/recipes/new">New Recipe</a>
-    <a class="link" href="/logout">Log Out</a>
-  </nav>
-</header>
-<form class="recipe-form mt-8" hx-post="{{.Action}}" hx-target="body">
-  <h2>Description</h2>
+<form class="recipe-form" hx-post="{{.Action}}" hx-target="body">
+  <header class="flex justify-between items-center">
+    <h1>
+      <input
+        placeholder="Recipe name"
+        required
+        type="text"
+        name="name"
+        value="{{.Recipe.Name}}"
+      />
+    </h1>
+    <nav>
+      <a class="link" href="/recipes">Recipes</a>
+      <a class="link" href="/recipes/new">New Recipe</a>
+      <a class="link" href="/logout">Log Out</a>
+    </nav>
+  </header>
+  <h2 class="mt-8">Description</h2>
   <input
     type="text"
     name="description"
