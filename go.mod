@@ -1,4 +1,4 @@
-module github.com/imsteev/recipebook-htmx
+module github.com/imsteev/recipebook
 
 go 1.23.0
 

@@ -9,8 +9,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/imsteev/recipebook-htmx/models"
-	"github.com/imsteev/recipebook-htmx/views"
+	"github.com/imsteev/recipebook/models"
+	"github.com/imsteev/recipebook/views"
 	"gorm.io/gorm"
 )
 

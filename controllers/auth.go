@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
-	"github.com/imsteev/recipebook-htmx/models"
-	"github.com/imsteev/recipebook-htmx/views"
+	"github.com/imsteev/recipebook/models"
+	"github.com/imsteev/recipebook/views"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
