@@ -40,7 +40,7 @@ type RecipeBook struct {
 	Name      string
 }
 
-type RecipeBookSharedLinks struct {
+type RecipeBookSharedLink struct {
 	gorm.Model
 	RecipeBookID uint
 	Slug         string `gorm:"unique"`

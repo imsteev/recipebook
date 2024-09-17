@@ -66,7 +66,7 @@ func (c *RecipebookController) GetRecipeBook(w http.ResponseWriter, r *http.Requ
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	var sharedLink models.RecipeBookSharedLinks
+	var sharedLink models.RecipeBookSharedLink
 	err = c.DB.Where("recipe_book_id = ?", recipebook.ID).First(&sharedLink).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -91,7 +91,7 @@ func (c *RecipebookController) CreateRecipeBookSharedLink(w http.ResponseWriter,
 	}
 
 	key := securecookie.GenerateRandomKey(32)
-	sharedLink := models.RecipeBookSharedLinks{
+	sharedLink := models.RecipeBookSharedLink{
 		RecipeBookID: recipebook.ID,
 		Slug:         fmt.Sprintf("%x", key),
 	}
@@ -103,4 +103,30 @@ func (c *RecipebookController) CreateRecipeBookSharedLink(w http.ResponseWriter,
 
 	fmt.Println(sharedLink)
 	w.Write([]byte(fmt.Sprintf(`<a href="/recipebooks/%s">%s</a>`, sharedLink.Slug, "Public Link")))
+}
+
+func (c *RecipebookController) GetRecipeBookBySlug(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	slug := params["slug"]
+
+	var sharedLink models.RecipeBookSharedLink
+	if err := c.DB.Where("slug = ?", slug).First(&sharedLink).Error; err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	var recipebook models.RecipeBook
+	if err := c.DB.Where("id = ?", sharedLink.RecipeBookID).First(&recipebook).Error; err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	err := c.Engine.Render(w, "recipebooks-guest.html", map[string]interface{}{
+		csrf.TemplateTag: csrf.TemplateField(r),
+		"RecipeBook":     recipebook,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

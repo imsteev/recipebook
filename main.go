@@ -48,7 +48,7 @@ func main() {
 		&models.Ingredient{},
 		&models.RecipeIngredient{},
 		&models.RecipeBook{},
-		&models.RecipeBookSharedLinks{},
+		&models.RecipeBookSharedLink{},
 	); err != nil {
 		log.Fatal("failed to migrate database")
 	}
@@ -82,6 +82,8 @@ func main() {
 	router.HandleFunc("/logout", authController.Logout).Methods("GET")
 	router.HandleFunc("/signup", authController.SignupPage).Methods("GET")
 	router.HandleFunc("/signup", authController.Signup).Methods("POST")
+	router.HandleFunc("/recipebooks/slug/{slug}", recipebookController.GetRecipeBookBySlug).Methods("GET")
+
 	privateRouter.HandleFunc("/recipes", recipeController.ListRecipes).Methods("GET")
 	privateRouter.HandleFunc("/recipes", recipeController.CreateRecipe).Methods("POST")
 	privateRouter.HandleFunc("/recipes/new", recipeController.NewRecipe).Methods("GET")
