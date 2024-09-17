@@ -32,7 +32,7 @@ func (c *AuthController) LandingPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.Engine.ExecuteContent(w, "landing.html", nil)
+	err = c.Engine.Render(w, "landing.html", nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -50,7 +50,7 @@ func (c *AuthController) LoginPage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/recipes", http.StatusSeeOther)
 		return
 	}
-	err = c.Engine.ExecuteContent(w, "login.html", nil)
+	err = c.Engine.Render(w, "login.html", nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -95,7 +95,7 @@ func (c *AuthController) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *AuthController) SignupPage(w http.ResponseWriter, r *http.Request) {
-	err := c.Engine.ExecuteContent(w, "signup.html", nil)
+	err := c.Engine.Render(w, "signup.html", nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -20,7 +20,7 @@ type RecipeController struct {
 }
 
 func (c *RecipeController) NewRecipe(w http.ResponseWriter, r *http.Request) {
-	err := c.Engine.ExecuteContent(w, "recipe-form.html", map[string]any{
+	err := c.Engine.Render(w, "recipe-form.html", map[string]any{
 		"Title":          "New Recipe",
 		"Action":         "/recipes",
 		"Recipe":         models.Recipe{},
@@ -95,7 +95,7 @@ func (c *RecipeController) ListRecipes(w http.ResponseWriter, r *http.Request) {
 	var recipes []models.Recipe
 	c.DB.Find(&recipes).Order("updated_at DESC")
 
-	err = c.Engine.ExecuteContent(w, "recipes.html", recipes)
+	err = c.Engine.Render(w, "recipes.html", recipes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -125,7 +125,7 @@ func (c *RecipeController) GetRecipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.Engine.ExecuteContent(w, "recipe.html", recipe)
+	err = c.Engine.Render(w, "recipe.html", recipe)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -154,7 +154,7 @@ func (c *RecipeController) EditRecipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.Engine.ExecuteContent(w, "recipe-form.html", map[string]any{
+	err = c.Engine.Render(w, "recipe-form.html", map[string]any{
 		"Title":          "Edit Recipe",
 		"Action":         fmt.Sprintf("/recipes/%s/edit", recipeID),
 		"Recipe":         recipe,

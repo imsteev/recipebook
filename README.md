@@ -9,6 +9,10 @@ For hot reloading, use [`air`](https://github.com/cosmtrek/air):
 air
 ```
 
+### Environment Variables
+Generate a 32-byte key for `SESSION_SECRET` and make sure it's available in your environment.
+An `.env.example` file is provided in case you want to cp into `.env` to use in development.
+
 ### TailwindCSS
 This project uses [TailwindCSS](https://tailwindcss.com/) for styling. If you
 have Node installed, you can use Bun or Node to watch for file changes in order

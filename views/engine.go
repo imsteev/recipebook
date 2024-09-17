@@ -18,7 +18,7 @@ func NewEngine(baseTemplate string) *Engine {
 	return &Engine{baseTemplate: baseTemplate}
 }
 
-func (e *Engine) ExecuteContent(w http.ResponseWriter, templateName string, data any) error {
+func (e *Engine) Render(w http.ResponseWriter, templateName string, data any) error {
 	t, err := template.ParseFS(allViews, e.baseTemplate, templateName)
 	if err != nil {
 		return fmt.Errorf("failed to parse templates: %w", err)
