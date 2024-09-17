@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 type Recipe struct {
 	gorm.Model
 	UserID       uint         `json:"user_id"`
+	RecipeBookID uint         `json:"recipebook_id"` // optional
 	Name         string       `json:"name"`
 	Ingredients  []Ingredient `json:"ingredients" gorm:"many2many:recipe_ingredients;"`
 	Description  string       `json:"description"`
@@ -29,4 +30,22 @@ type User struct {
 	gorm.Model
 	Username string `json:"username"`
 	Password string `json:"-"` // "-" tag prevents password from being serialized to JSON
+}
+
+// RecipeBooks is a collection of recipes.
+// One requirement to consider: ability to gift RecipeBooks to other users. Would need to think about ownership.
+type RecipeBook struct {
+	gorm.Model
+	CreatedBy uint
+	Name      string
+}
+
+// RecipeMessage models messages associated with a RecipeBook.
+// Intention is to support a gift message, but could also be used for other
+// commentary on a Recipe.
+type RecipeMessage struct {
+	gorm.Model
+	From     string // required
+	RecipeID uint   //required
+	Message  string // required
 }

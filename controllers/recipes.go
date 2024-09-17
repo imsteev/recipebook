@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/imsteev/recipebook/middleware"
 	"github.com/imsteev/recipebook/models"
 	"github.com/imsteev/recipebook/views"
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ type RecipeController struct {
 }
 
 func (c *RecipeController) NewRecipe(w http.ResponseWriter, r *http.Request) {
-	err := c.Engine.Render(w, "recipe-form.html", map[string]any{
+	err := c.Engine.Render(w, "recipes-form.html", map[string]any{
 		"Title":          "New Recipe",
 		"Action":         "/recipes",
 		"Recipe":         models.Recipe{},
@@ -34,18 +35,7 @@ func (c *RecipeController) NewRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *RecipeController) CreateRecipe(w http.ResponseWriter, r *http.Request) {
-	sesh, err := c.Store.Get(r, "sesh")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if sesh.Values["loggedInUserID"] == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -69,7 +59,7 @@ func (c *RecipeController) CreateRecipe(w http.ResponseWriter, r *http.Request) 
 		Description:  description,
 		Ingredients:  ingredients,
 		Instructions: instructions,
-		UserID:       uint(sesh.Values["loggedInUserID"].(uint)),
+		UserID:       uint(r.Context().Value(middleware.LoggedInUserCtxKey{}).(uint)),
 	}
 
 	if err := c.DB.Create(&recipe).Error; err != nil {
@@ -81,21 +71,10 @@ func (c *RecipeController) CreateRecipe(w http.ResponseWriter, r *http.Request) 
 }
 
 func (c *RecipeController) ListRecipes(w http.ResponseWriter, r *http.Request) {
-	sesh, err := c.Store.Get(r, "sesh")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if sesh.Values["loggedInUserID"] == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
 	var recipes []models.Recipe
 	c.DB.Find(&recipes).Order("updated_at DESC")
 
-	err = c.Engine.Render(w, "recipes.html", recipes)
+	err := c.Engine.Render(w, "recipes-list.html", recipes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -103,17 +82,6 @@ func (c *RecipeController) ListRecipes(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *RecipeController) GetRecipe(w http.ResponseWriter, r *http.Request) {
-	sesh, err := c.Store.Get(r, "sesh")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if sesh.Values["loggedInUserID"] == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
 	params := mux.Vars(r)
 	recipeID := params["id"]
 
@@ -125,7 +93,7 @@ func (c *RecipeController) GetRecipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.Engine.Render(w, "recipe.html", recipe)
+	err := c.Engine.Render(w, "recipes-show.html", recipe)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -133,16 +101,6 @@ func (c *RecipeController) GetRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *RecipeController) EditRecipe(w http.ResponseWriter, r *http.Request) {
-	sesh, err := c.Store.Get(r, "sesh")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if sesh.Values["loggedInUserID"] == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
 	params := mux.Vars(r)
 	recipeID := params["id"]
 
@@ -154,7 +112,7 @@ func (c *RecipeController) EditRecipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = c.Engine.Render(w, "recipe-form.html", map[string]any{
+	err := c.Engine.Render(w, "recipe-form.html", map[string]any{
 		"Title":          "Edit Recipe",
 		"Action":         fmt.Sprintf("/recipes/%s/edit", recipeID),
 		"Recipe":         recipe,
@@ -167,18 +125,8 @@ func (c *RecipeController) EditRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *RecipeController) UpdateRecipe(w http.ResponseWriter, r *http.Request) {
-	sesh, err := c.Store.Get(r, "sesh")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
-	if sesh.Values["loggedInUserID"] == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

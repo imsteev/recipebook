@@ -1,0 +1,20 @@
+{{ define "content" }}
+<header class="flex justify-between items-center">
+  <h1>{{.RecipeBook.Name}}</h1>
+  <nav class="flex flex-col gap-2">
+    <a class="link" href="/recipes">Recipes</a>
+    <a class="link" href="/recipebooks">Recipe Books</a>
+    <a class="link" href="/recipes/new">New Recipe</a>
+    <a class="link" href="/recipebooks/new">New Recipebook</a>
+    <a class="link" href="/logout">Log Out</a>
+  </nav>
+</header>
+<div>
+  <p>Share a link to this recipebook so others can add to it!</p>
+  <button
+    class="p-2 rounded-md bg-slate-100 border border-slate-300 shadow-md hover:bg-slate-200 hover:shadow-lg transition-all duration-200"
+  >
+    Copy Link
+  </button>
+</div>
+{{ end }}

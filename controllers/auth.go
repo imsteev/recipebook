@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/sessions"
 	"github.com/imsteev/recipebook/models"
 	"github.com/imsteev/recipebook/views"
@@ -50,7 +51,7 @@ func (c *AuthController) LoginPage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/recipes", http.StatusSeeOther)
 		return
 	}
-	err = c.Engine.Render(w, "login.html", nil)
+	err = c.Engine.Render(w, "login.html", map[string]any{csrf.TemplateTag: csrf.TemplateField(r)})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -95,7 +96,7 @@ func (c *AuthController) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *AuthController) SignupPage(w http.ResponseWriter, r *http.Request) {
-	err := c.Engine.Render(w, "signup.html", nil)
+	err := c.Engine.Render(w, "signup.html", map[string]any{csrf.TemplateTag: csrf.TemplateField(r)})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -119,7 +120,10 @@ func (c *AuthController) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := models.User{Username: username, Password: string(passwordHash)}
-	c.DB.Create(&user)
+	if err := c.DB.Create(&user).Error; err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
