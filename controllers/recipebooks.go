@@ -66,9 +66,16 @@ func (c *RecipebookController) GetRecipeBook(w http.ResponseWriter, r *http.Requ
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	var sharedLink models.RecipeBookSharedLinks
+	err = c.DB.Where("recipe_book_id = ?", recipebook.ID).First(&sharedLink).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	c.Engine.Render(w, "recipebooks-show.html", map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
 		"RecipeBook":     recipebook,
+		"SharedLink":     sharedLink,
 	})
 }
 

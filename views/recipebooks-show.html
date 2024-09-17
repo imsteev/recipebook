@@ -10,6 +10,12 @@
   </nav>
 </header>
 <div>
+  {{ if .SharedLink.Slug }} Share link:
+  <a href="/recipebooks/{{.SharedLink.Slug}}"> {{.SharedLink.Slug}} </a>
+  <button _="on click writeText('{{.SharedLink.Slug}}') on navigator.clipboard">
+    click to copy
+  </button>
+  {{ else }}
   <form hx-post="/recipebooks/{{.RecipeBook.ID}}/share" hx-swap="outerHTML">
     {{ .csrfField }}
     <button
@@ -18,5 +24,6 @@
       Generate a link to share this recipe book
     </button>
   </form>
+  {{ end }}
 </div>
 {{ end }}
