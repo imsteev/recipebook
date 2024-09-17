@@ -1,5 +1,6 @@
 {{define "content"}}
 <form class="recipe-form" hx-post="{{.Action}}" hx-target="body">
+  {{.csrfField}}
   <header class="flex justify-between items-center">
     <h1>
       <input

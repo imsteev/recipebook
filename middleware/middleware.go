@@ -4,9 +4,12 @@ import (
 	"net/http"
 )
 
+// problem i'm trying to solve: make sure that the back button doesn't reveal
+// private data. the example is: logged in user can see private recipes, but upon
+// logout, they can't go back to the recipes and see them. currently that's possible.
 func NoCache(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Vary", "HX-Request")
+		w.Header().Add("Vary", "HX-Request")
 		w.Header().Add("Cache-Control", "no-cache, no-store")
 		next.ServeHTTP(w, r)
 	})

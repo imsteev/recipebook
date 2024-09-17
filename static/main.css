@@ -598,6 +598,14 @@ textarea {
   margin-top: 2rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
 .flex {
   display: flex;
 }
@@ -646,6 +654,15 @@ textarea {
   border-radius: 0.125rem;
 }
 
+.border-2 {
+  border-width: 2px;
+}
+
+.border-slate-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(226 232 240 / var(--tw-border-opacity));
+}
+
 .bg-blue-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(59 130 246 / var(--tw-bg-opacity));
@@ -661,12 +678,21 @@ textarea {
   background-color: rgb(203 213 225 / var(--tw-bg-opacity));
 }
 
+.bg-slate-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(248 250 252 / var(--tw-bg-opacity));
+}
+
 .p-2 {
   padding: 0.5rem;
 }
 
 .p-8 {
   padding: 2rem;
+}
+
+.p-4 {
+  padding: 1rem;
 }
 
 .text-slate-400 {

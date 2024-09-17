@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/imsteev/recipebook/models"
@@ -20,9 +21,10 @@ type RecipeController struct {
 
 func (c *RecipeController) NewRecipe(w http.ResponseWriter, r *http.Request) {
 	err := c.Engine.ExecuteContent(w, "recipe-form.html", map[string]any{
-		"Title":  "New Recipe",
-		"Action": "/recipes",
-		"Recipe": models.Recipe{},
+		"Title":          "New Recipe",
+		"Action":         "/recipes",
+		"Recipe":         models.Recipe{},
+		csrf.TemplateTag: csrf.TemplateField(r),
 	})
 
 	if err != nil {
@@ -153,9 +155,10 @@ func (c *RecipeController) EditRecipe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = c.Engine.ExecuteContent(w, "recipe-form.html", map[string]any{
-		"Title":  "Edit Recipe",
-		"Action": fmt.Sprintf("/recipes/%s/edit", recipeID),
-		"Recipe": recipe,
+		"Title":          "Edit Recipe",
+		"Action":         fmt.Sprintf("/recipes/%s/edit", recipeID),
+		"Recipe":         recipe,
+		csrf.TemplateTag: csrf.TemplateField(r),
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

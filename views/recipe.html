@@ -4,29 +4,34 @@
     <h1>{{.Name}}</h1>
     <a class="link" href="/recipes/{{.ID}}/edit">Edit</a>
   </hgroup>
-
   <nav>
     <a class="link" href="/recipes">Recipes</a>
     <a class="link" href="/recipes/new">New Recipe</a>
     <a class="link" href="/signout">Log Out</a>
   </nav>
 </header>
-<p>{{.Description}}</p>
-<div class="flex flex-col gap-2 mt-8">
-  <h2>Ingredients</h2>
-  <ul>
-    {{range .Ingredients}}
-    <li>{{.Name}} [{{.Quantity}}]</li>
+<div class="mt-4">
+  <p class="ml-2">{{.Description}}</p>
+  <div
+    class="flex flex-col gap-2 mt-8 p-4 border-2 border-slate-200 rounded-md bg-slate-50"
+  >
+    <h2>Ingredients</h2>
+    <ul>
+      {{range .Ingredients}}
+      <li>{{.Name}} [{{.Quantity}}]</li>
+      {{end}}
+    </ul>
+  </div>
+  <div
+    class="flex flex-col gap-2 mt-8 p-4 border-2 border-slate-200 rounded-md bg-slate-50"
+  >
+    <h2>Instructions</h2>
+    {{if .Instructions}}
+    <pre>{{.Instructions}}</pre>
+    {{else}}
+    <i class="text-slate-400">No instructions provided</i>
     {{end}}
-  </ul>
-</div>
-<div class="flex flex-col gap-2 mt-8">
-  <h2>Instructions</h2>
-  {{if .Instructions}}
-  <pre>{{.Instructions}}</pre>
-  {{else}}
-  <i class="text-slate-400">No instructions provided</i>
-  {{end}}
+  </div>
 </div>
 
 {{end}}

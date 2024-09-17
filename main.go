@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/imsteev/recipebook/controllers"
@@ -53,7 +54,7 @@ func main() {
 	setupRoutes(router)
 
 	fmt.Println("Server is running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", csrf.Protect([]byte(os.Getenv("SESSION_SECRET")))(router)))
 }
 
 func setupRoutes(router *mux.Router) {
