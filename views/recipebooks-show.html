@@ -10,11 +10,13 @@
   </nav>
 </header>
 <div>
-  <p>Share a link to this recipebook so others can add to it!</p>
-  <button
-    class="p-2 rounded-md bg-slate-100 border border-slate-300 shadow-md hover:bg-slate-200 hover:shadow-lg transition-all duration-200"
-  >
-    Copy Link
-  </button>
+  <form hx-post="/recipebooks/{{.RecipeBook.ID}}/share" hx-swap="outerHTML">
+    {{ .csrfField }}
+    <button
+      class="p-2 rounded-md bg-slate-100 border border-slate-300 shadow-md hover:bg-slate-200 hover:shadow-lg transition-all duration-200"
+    >
+      Generate a link to share this recipe book
+    </button>
+  </form>
 </div>
 {{ end }}

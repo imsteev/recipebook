@@ -40,6 +40,12 @@ type RecipeBook struct {
 	Name      string
 }
 
+type RecipeBookSharedLinks struct {
+	gorm.Model
+	RecipeBookID uint
+	Slug         string `gorm:"unique"`
+}
+
 // RecipeMessage models messages associated with a RecipeBook.
 // Intention is to support a gift message, but could also be used for other
 // commentary on a Recipe.

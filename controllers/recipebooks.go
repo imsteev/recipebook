@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/imsteev/recipebook/middleware"
 	"github.com/imsteev/recipebook/models"
@@ -69,4 +70,30 @@ func (c *RecipebookController) GetRecipeBook(w http.ResponseWriter, r *http.Requ
 		csrf.TemplateTag: csrf.TemplateField(r),
 		"RecipeBook":     recipebook,
 	})
+}
+
+func (c *RecipebookController) CreateRecipeBookSharedLink(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	recipeBookId := params["id"]
+
+	var recipebook models.RecipeBook
+	err := c.DB.Where("id = ?", recipeBookId).First(&recipebook).Error
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	key := securecookie.GenerateRandomKey(32)
+	sharedLink := models.RecipeBookSharedLinks{
+		RecipeBookID: recipebook.ID,
+		Slug:         fmt.Sprintf("%x", key),
+	}
+	err = c.DB.Create(&sharedLink).Error
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println(sharedLink)
+	w.Write([]byte(fmt.Sprintf(`<a href="/recipebooks/%s">%s</a>`, sharedLink.Slug, "Public Link")))
 }

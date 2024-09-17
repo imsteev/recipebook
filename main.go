@@ -48,6 +48,7 @@ func main() {
 		&models.Ingredient{},
 		&models.RecipeIngredient{},
 		&models.RecipeBook{},
+		&models.RecipeBookSharedLinks{},
 	); err != nil {
 		log.Fatal("failed to migrate database")
 	}
@@ -91,6 +92,7 @@ func main() {
 	privateRouter.HandleFunc("/recipebooks", recipebookController.CreateRecipeBook).Methods("POST")
 	privateRouter.HandleFunc("/recipebooks", recipebookController.ListRecipebooks).Methods("GET")
 	privateRouter.HandleFunc("/recipebooks/{id}", recipebookController.GetRecipeBook).Methods("GET")
+	privateRouter.HandleFunc("/recipebooks/{id}/share", recipebookController.CreateRecipeBookSharedLink).Methods("POST")
 
 	fmt.Println("Server is running on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", csrf.Protect([]byte(secret))(router)))
